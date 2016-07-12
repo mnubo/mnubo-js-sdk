@@ -18,6 +18,10 @@ interface ClientOptions {
   id: string;
   secret: string;
   env: string;
+  compression?: {
+      request?: string, /* supported value are 'gzip' or 'deflate' */
+      response?: string /* supported value are 'gzip' or 'deflate' */
+  },
   httpOptions?: RequestOptions;
 }
 
@@ -125,6 +129,16 @@ export class Client {
     };
 
     contentType = contentType || 'application/json';
+
+    if (this.options.compression) {
+        if (this.options.compression.request) {
+            options.headers.set('Content-Encoding', this.options.compression.request);
+        }
+
+        if (this.options.compression.response) {
+            options.headers.set('Accept-Encoding', this.options.compression.response);
+        }
+    }
 
     options.headers.set('Authorization', `Bearer ${this.token.value}`);
     options.headers.set('Content-Type', `${contentType}`);
